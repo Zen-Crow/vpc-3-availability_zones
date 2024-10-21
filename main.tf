@@ -1,25 +1,25 @@
-### Datasource
+### Datasource ###
 data "yandex_client_config" "client" {}
 
-### Local variables
+### Local variables ###
 locals {
   network_name = var.vpc_network_name != null ? var.vpc_network_name : "${var.name_prefix}"
   folder_id    = var.folder_id != null ? data.yandex_client_config.client.folder_id : var.cloud_id
 }
 
-### Create Network
+### Network ###
 resource "yandex_vpc_network" "this" {
   name = local.network_name
 }
 
-### Gateway
+### Gateway ###
 resource "yandex_vpc_gateway" "gt" {
   name      = "${local.network_name}-gt"
   folder_id = local.folder_id
   shared_egress_gateway {}
 }
 
-### Route table 
+### Route table ###
 resource "yandex_vpc_route_table" "rt" {
   name       = "${local.network_name}-rt"
   network_id = yandex_vpc_network.this.id
@@ -30,7 +30,7 @@ resource "yandex_vpc_route_table" "rt" {
   }
 }
 
-### Create VPC subnet
+### Subnets ###
 resource "yandex_vpc_subnet" "this" {
   for_each = var.zones
 
@@ -43,7 +43,7 @@ resource "yandex_vpc_subnet" "this" {
   route_table_id = yandex_vpc_route_table.rt.id
 }
 
-### Default security group
+### Security group with rules ###
 resource "yandex_vpc_security_group" "group" {
   name       = "${local.network_name}-sg"
   network_id = yandex_vpc_network.this.id
