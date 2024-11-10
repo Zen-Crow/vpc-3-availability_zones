@@ -71,6 +71,20 @@ resource "yandex_vpc_security_group" "group" {
   }
 
   ingress {
+    protocol       = "TCP"
+    description    = "Grafana"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 3000
+  }
+
+  ingress {
+    protocol       = "TCP"
+    description    = "Prometheus"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    port           = 9090
+  }
+
+  ingress {
     protocol       = "ICMP"
     description    = "Allow Echo request - ICMP"
     v4_cidr_blocks = ["0.0.0.0/0"]
